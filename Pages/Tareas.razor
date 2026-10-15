@@ -1,0 +1,66 @@
+﻿@page "/tareas"
+@inject TareasPWA.Services.TareaService Servicio
+
+<PageTitle>Mis tareas</PageTitle>
+
+<h1>Mis tareas</h1>
+<p>Aplicación PWA de ejemplo con .NET 10.</p>
+
+<div class="input-group mb-4">
+    <input class="form-control"
+           placeholder="Escriba una tarea"
+           @bind="nuevaTarea"
+           @bind:event="oninput" />
+    <button class="btn btn-primary" @onclick="Agregar">
+        Agregar
+    </button>
+</div>
+
+@if (Servicio.ObtenerTodas().Count == 0)
+{
+    <div class="alert alert-info">
+        No existen tareas registradas.
+    </div>
+}
+else
+{
+    <div class="list-group">
+        @foreach (var tarea in Servicio.ObtenerTodas())
+        {
+            <div class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                    @if (tarea.Completada)
+                    {
+                        <span class="text-decoration-line-through text-muted">
+                            @tarea.Titulo
+                        </span>
+                    }
+                    else
+                    {
+                        <span>@tarea.Titulo</span>
+                    }
+                </div>
+                <div>
+                    <button class="btn btn-sm btn-outline-success me-2"
+                            @onclick="() => Servicio.CambiarEstado(tarea.Id)">
+                        Cambiar estado
+                    </button>
+                    <button class="btn btn-sm btn-outline-danger"
+                            @onclick="() => Servicio.Eliminar(tarea.Id)">
+                        Eliminar
+                    </button>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+@code {
+    private string nuevaTarea = string.Empty;
+
+    private void Agregar()
+    {
+        Servicio.Agregar(nuevaTarea);
+        nuevaTarea = string.Empty;
+    }
+}
